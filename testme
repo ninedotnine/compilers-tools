@@ -23,6 +23,9 @@ plccmk || exit 99
 # will be returned to the os
 exit_status=0
 
+# list of files that didn't work
+borked="$colour broken stuff:$NC$boldon"
+
 # location of the reference implementation
 ref="/usr/bin/local/plax"
 
@@ -52,14 +55,22 @@ else
         echo -n "mine: "
         java PL "$filename" > dantest
         bass dantest > mine.txt
-        diff --brief "mine.txt" "ref.txt" \
-            && echo "cool!" || exit_status=$((exit_status+1))
+        diff --brief "mine.txt" "ref.txt"
+        if [ "$?" -eq 0 ]; then
+            echo "cool!" 
+        else
+            exit_status=$((exit_status+1))
+            borked="$borked \n$filename"
+        fi
     done
 fi
 
-# if [ "$exit_status" -eq 0 ]; then
-#     echo "☺"
-# fi
+echo "$colour------------------ done! ------------------$NC"
+if [ "$exit_status" -eq 0 ]; then
+    echo "☺"
+else
+    echo "$borked$boldoff"
+fi
 
 echo "cleaning up..."
 rm "mine.txt" "ref.txt"
