@@ -1,0 +1,42 @@
+#!/bin/dash
+
+# tryFilename="../dantest"
+tryFilename="dantest"
+colour='\033[1;30m'
+NC='\033[0m' # no colour
+
+echo "$colour------------------ now running plccmk ------------------$NC"
+plccmk || exit 44
+
+cd "Java/"
+
+echo "$colour------------------ now running PL ------------------$NC"
+if [ "$#" -eq 0 ] ; then
+    echo "reading program from stdin..."
+    java -ea PL > "$tryFilename" 
+    exit_status="$?"
+else
+    # use a fifo to help get the exit status -- this was difficult with pipes 
+#     rm temp_fifo
+    mkfifo temp_fifo 2> /dev/null
+    tee "$tryFilename" < temp_fifo &
+    if [ "$(pwd)" = "/home/student/soucydi194/463/a3/Compiler/G1/Java" ]; then
+        # for some reason G1 reads from stdin
+#         java -ea PL < "../$1" | tee "$tryFilename" 
+        java -ea PL < "../$1" > temp_fifo
+    else
+        # G2 reads from a file passed as an argument
+#         java -ea PL "../$1" | tee "$tryFilename" 
+        java -ea PL "../$1" > temp_fifo
+    fi
+    exit_status="$?"
+fi
+
+if [ "$exit_status" -eq 0 ]; then
+    echo "$colour------------------ now bassing ------------------$NC"
+    bass "$tryFilename" 
+    exit_status="$?"
+fi
+
+rm temp_fifo
+exit "$exit_status"

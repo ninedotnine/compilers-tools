@@ -1,0 +1,15 @@
+#!/bin/dash
+
+tryFilename="dantest.sax"
+
+plccmk || exit 44
+
+cd "Java/"
+
+if [ "$#" -eq 0 ] ; then
+    echo "reading program from stdin..."
+    java -ea ScanTest > "$tryFilename" 
+else
+    echo "------------------ now running ScanTest ------------------"
+    java -ea ScanTest < "../$1" | tee "$tryFilename" 
+fi
