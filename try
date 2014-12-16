@@ -5,6 +5,13 @@ tryFilename="dantest"
 colour='\033[1;30m'
 NC='\033[0m' # no colour
 
+if [ ! "$#" -eq 0 ] ; then
+    if [ ! -e "$1" ]; then
+        echo "file $1 does not exist"
+        exit 1;
+    fi
+fi
+
 echo "$colour------------------ now running plccmk ------------------$NC"
 plccmk || exit 44
 
@@ -12,6 +19,7 @@ cd "Java/"
 
 echo "$colour------------------ now running PL ------------------$NC"
 if [ "$#" -eq 0 ] ; then
+    # sorry, this is borked :(
     echo "reading program from stdin..."
     java -ea PL > "$tryFilename" 
     exit_status="$?"
