@@ -34,10 +34,10 @@ if [ "$#" -eq 1 ]; then
     # if argument is provided, test only that file 
     filename="../$1"
     echo "$colour------------------ now running plax $filename ------------------$NC"
-    plax "$filename" | awk 'NR > 4' > ref.txt
+    plax "$filename" 2>&1 | awk 'NR > 4' | tee ref.txt
     echo "$colour------------------ now running java PL $filename ------------------$NC"
     java PL "$filename" > dantest
-    bass dantest > mine.txt
+    bass dantest 2>&1 | tee mine.txt
     # if files aren't equal, drop into vimdiff
     echo "$colour------------------ now comparing ------------------$NC"
     diff --brief "mine.txt" "ref.txt" \
@@ -50,11 +50,11 @@ else
         echo "$boldon $filename $boldoff" 
 #         echo "$colour------------------ now running plax $filename ------------------$NC"
         echo -n "plax: "
-        plax "$filename" | awk 'NR > 4' > ref.txt
+        plax "$filename" 2>&1 | awk 'NR > 4' | tee ref.txt
 #         echo "$colour------------------ now running java PL $filename ------------------$NC"
         echo -n "mine: "
         java PL "$filename" > dantest
-        bass dantest > mine.txt
+        bass dantest 2>&1 | tee mine.txt
         diff --brief "mine.txt" "ref.txt"
         if [ "$?" -eq 0 ]; then
             echo "cool!" 
@@ -73,7 +73,7 @@ else
 fi
 
 echo "cleaning up..."
-rm "mine.txt" "ref.txt"
+# rm "mine.txt" "ref.txt"
 cd ..
 
 return "$exit_status"
